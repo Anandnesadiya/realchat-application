@@ -90,5 +90,5 @@ const userlogin = (req, res) => {
 };
 
 
-module.exports = { getdata, createUser, userlogin }
-// hello everyone
+module.exports = { getdata, createUser }
+// hello 
