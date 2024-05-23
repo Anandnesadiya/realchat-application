@@ -2,7 +2,6 @@
 
 const { MongoClient } = require('mongodb');
 
-// MongoDB connection URI
 const MONGODB_URI = 'mongodb://localhost:27017/ChatApp'; // Replace 'mydatabase' with your database name
 
 let _db;

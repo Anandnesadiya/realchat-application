@@ -22,11 +22,10 @@ const getdata = async (req, res) => {
 
 const createUser = (req, res) => {
     const { UserName, Email, Password, PhoneNumber } = req.body;
-    const userId = new ObjectId();
+    const userId = new ObjectId().toString(); // Convert ObjectId to string
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^\d{10}$/;
-    
 
     if (!UserName || !Email || !Password || !PhoneNumber) {
         return res.status(400).json({ error: 'Missing required fields' });
@@ -42,18 +41,24 @@ const createUser = (req, res) => {
 
     const db = getDb();
 
-    db.collection('users').countDocuments({ Email })
-        .then(emailCount => {
-            if (emailCount > 0) {
-                return Promise.reject({ error: 'Email already exists' });
+    db.collection('users').findOne({ $or: [{ Email }, { PhoneNumber }] })
+        .then(existingUser => {
+            if (existingUser) {
+                if (existingUser.Email === Email) {
+                    return Promise.reject({ error: 'Email already exists' });
+                } else if (existingUser.PhoneNumber === PhoneNumber) {
+                    return Promise.reject({ error: 'Phone number already exists' });
+                }
             }
-
             return db.collection('users').insertOne({ _id: userId, UserName, Email, Password, PhoneNumber });
         })
         .then(() => {
             return res.status(200).json({ message: 'User added successfully!', userId });
         })
         .catch(error => {
+            if (error.error) {
+                return res.status(400).json({ error: error.error });
+            }
             console.error('Error creating user:', error);
             return res.status(500).json({ error: 'Internal server error' });
         });
