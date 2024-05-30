@@ -83,7 +83,7 @@ const userlogin = (req, res) => {
             if (user.Password !== Password) {
                 return Promise.reject(2003);
             }
-            const token = jwt.sign({ email: Email, userid: user._id }, 'your-secret-key');
+            const token = jwt.sign({ email: Email, userid: user._id, username: user.UserName }, 'your-secret-key');
             return { accesstoken: token };
         })
         .then(token => {
